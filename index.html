@@ -388,6 +388,9 @@
     // AUTHENTICATION & INIT
     // ----------------------------------------------------
     window.addEventListener('DOMContentLoaded', async () => {
+      // Sayfa yüklenir yüklenmez veritabanı dinleyicisini doğrudan başlatıyoruz
+      startRealtimeListeners();
+
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
@@ -395,15 +398,12 @@
           await signInAnonymously(auth);
         }
       } catch (err) {
-        console.error("Auth Error:", err);
+        console.warn("Giriş uyarısı (İşlem devam edecek):", err);
       }
 
       onAuthStateChanged(auth, (user) => {
         if (user) {
           currentUser = user;
-          startRealtimeListeners();
-        } else {
-          signInAnonymously(auth).catch(console.error);
         }
       });
 
@@ -458,13 +458,12 @@
         return;
       }
 
+      // Oturum yoksa tekrar anonim giriş dene ama hata verse de durma
       if (!auth.currentUser) {
         try {
           await signInAnonymously(auth);
         } catch(authErr) {
-          console.error("Giriş Yapılamadı:", authErr);
-          showToast('Firebase Bağlantı Hatası: Giriş yapılamadı.', 'error');
-          return;
+          console.warn("Anonim giriş pas geçildi, kayda devam ediliyor...", authErr);
         }
       }
 
@@ -489,7 +488,7 @@
         showToast('Çekiliş kaydınız başarıyla kaydedildi! 🎉', 'success');
       } catch (e) {
         console.error("Firestore Yazma Hatası:", e);
-        showToast(`Hata: ${e.message || 'Veritabanına yazılamadı.'}`, 'error');
+        showToast(`Veritabanı Hatası: ${e.message || 'Yazma izni reddedildi.'}`, 'error');
       }
     };
 
