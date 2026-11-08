@@ -1,1 +1,715 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SURENA Clan - Altın Bilet & Klan Portalı</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            coc: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            cocGold: '#FFD700',
+            cocGoldDark: '#B8860B',
+            cocDark: '#111827',
+            cocCard: '#1F2937',
+            cocRed: '#DC2626',
+            cocBlue: '#2563EB',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+    
+    .gold-glow {
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #FFF5C0 0%, #FFD700 50%, #B8860B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-button {
+      background: linear-gradient(180deg, #FFE87C 0%, #FFD700 50%, #D4AF37 100%);
+      text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    .gold-button:hover {
+      background: linear-gradient(180deg, #FFF099 0%, #FFE033 50%, #E5BE39 100%);
+    }
+
+    .winner-card {
+      animation: winnerPop 0.8s ease-out forwards;
+    }
+
+    @keyframes winnerPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo & Name -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('giveaway')">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-300 p-0.5 gold-glow">
+          <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+            <span class="text-2xl">⚔️</span>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-2xl font-black tracking-wider gold-gradient-text uppercase">SURENA</h1>
+          <p class="text-xs text-amber-300/80 tracking-widest font-semibold">CLASH OF CLANS</p>
+        </div>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="hidden md:flex space-x-2">
+        <button onclick="switchTab('giveaway')" id="nav-giveaway" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 text-amber-400 bg-slate-800">
+          <i class="fa-solid fa-ticket text-amber-400"></i> Altın Bilet Çekilişi
+        </button>
+        <button onclick="switchTab('rules')" id="nav-rules" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800">
+          <i class="fa-solid fa-scroll text-amber-400"></i> Klan Kuralları
+        </button>
+        <button onclick="switchTab('announcements')" id="nav-announcements" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800">
+          <i class="fa-solid fa-bullhorn text-amber-400"></i> Duyurular
+        </button>
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button onclick="toggleMobileMenu()" class="p-2 rounded-lg text-amber-400 hover:bg-slate-800">
+          <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-amber-500/30 px-4 py-3 space-y-2">
+      <button onclick="switchTab('giveaway'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-ticket text-amber-400"></i> Altın Bilet Çekilişi
+      </button>
+      <button onclick="switchTab('rules'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-scroll text-amber-400"></i> Klan Kuralları
+      </button>
+      <button onclick="switchTab('announcements'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-bullhorn text-amber-400"></i> Duyurular
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO & COUNTDOWN BANNER -->
+  <div class="relative overflow-hidden bg-slate-950 py-10 border-b border-slate-800">
+    <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#FFD700_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <div class="max-w-5xl mx-auto px-4 text-center relative z-10">
+      <span class="inline-block px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-xs font-bold tracking-widest uppercase mb-3 border border-amber-500/30">
+        ⚔️ SURENA KLAN ÇEKİLİŞİ ⚔️
+      </span>
+      <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white mb-4">
+        AYIN 10'U <span class="gold-gradient-text">ALTIN BİLET ÇEKİLİŞİ</span>
+      </h2>
+      
+      <!-- Live Countdown Widget -->
+      <div id="countdown-container" class="my-6 inline-flex flex-wrap items-center justify-center gap-3 bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30 shadow-2xl">
+        <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 min-w-[70px]">
+          <span id="cd-days" class="block text-2xl sm:text-3xl font-black text-amber-400">00</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase">Gün</span>
+        </div>
+        <span class="text-xl font-bold text-amber-500">:</span>
+        <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 min-w-[70px]">
+          <span id="cd-hours" class="block text-2xl sm:text-3xl font-black text-amber-400">00</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase">Saat</span>
+        </div>
+        <span class="text-xl font-bold text-amber-500">:</span>
+        <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 min-w-[70px]">
+          <span id="cd-minutes" class="block text-2xl sm:text-3xl font-black text-amber-400">00</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase">Dakika</span>
+        </div>
+        <span class="text-xl font-bold text-amber-500">:</span>
+        <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 min-w-[70px]">
+          <span id="cd-seconds" class="block text-2xl sm:text-3xl font-black text-amber-400">00</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase">Saniye</span>
+        </div>
+      </div>
+      
+      <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto">
+        Çekiliş her ayın 10'unda saat 00:00'da sonlanır ve <strong>3 Talihli Üye</strong> Altın Bilet kazanır!
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- 1. GIVEAWAY TAB -->
+    <section id="sec-giveaway" class="tab-section">
+
+      <!-- WINNERS ANNOUNCEMENT SECTION (Shows on Day 10) -->
+      <div id="winners-showcase" class="hidden mb-10 p-6 sm:p-8 bg-gradient-to-b from-amber-950/60 via-slate-900 to-slate-900 rounded-3xl border-2 border-amber-500 shadow-2xl relative overflow-hidden text-center">
+        <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+        <span class="px-4 py-1.5 bg-amber-500/20 text-amber-400 rounded-full text-xs font-black tracking-widest uppercase border border-amber-500/40">
+          🏆 AYIN 10'U KAZANANLARI AÇIKLANDI 🏆
+        </span>
+        <h3 class="text-3xl sm:text-4xl font-black text-white mt-3 mb-2">TEBRİKLER ŞANSLI 3 OYUNCU!</h3>
+        <p class="text-slate-400 text-sm mb-8">Bu ayın Altın Bilet kazanan klan üyelerimiz belirlenmiştir. Yarın yeni çekiliş başlayacaktır!</p>
+
+        <!-- 3 Winner Cards Grid -->
+        <div id="winners-grid" class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- PARTICIPATION FORM SECTION -->
+      <div id="giveaway-active-box" class="grid md:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left: Form -->
+        <div class="md:col-span-7 space-y-6">
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-6 sm:p-8 rounded-2xl border border-amber-500/40 shadow-xl relative overflow-hidden">
+            
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 text-2xl">
+                  🎟️
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-white">Çekilişe Katıl</h3>
+                  <p class="text-xs text-slate-400">Her cihazdan sadece 1 Oyuncu Kodu kabul edilir.</p>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                KAYITLAR AÇIK
+              </span>
+            </div>
+
+            <!-- Form Container -->
+            <div id="registration-form-container">
+              <!-- Form Unregistered -->
+              <div id="form-unregistered" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                    Clash of Clans Oyuncu Kodunuz (Player Tag)
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-mono font-bold">#</span>
+                    <input type="text" id="player-tag-input" placeholder="P9Y082LLQ" class="w-full pl-8 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono uppercase focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
+                  </div>
+                  <p class="text-xs text-slate-500 mt-2">
+                    💡 İpucu: Profilinizdeki isminizin altında yer alan "#" ile başlayan koddur (ör. #P9Y082LLQ).
+                  </p>
+                </div>
+                
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                    Klan İçi Oyuncu Adınız
+                  </label>
+                  <input type="text" id="player-name-input" placeholder="Örn: Barbar Kral" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
+                </div>
+
+                <button onclick="handleRegister()" id="submit-btn" class="w-full gold-button py-3.5 px-6 rounded-xl font-black text-slate-950 uppercase tracking-wider shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
+                  <span>Çekilişe Katıl</span> <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+
+              <!-- Registered View -->
+              <div id="form-registered" class="hidden space-y-4 bg-slate-950/80 p-5 rounded-xl border border-emerald-500/30">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-1">
+                      <i class="fa-solid fa-circle-check mr-1"></i> Çekiliş Kaydınız Onaylandı!
+                    </span>
+                    <h4 class="text-lg font-bold text-white" id="reg-player-name">--</h4>
+                    <p class="text-sm font-mono text-amber-400 font-bold" id="reg-player-tag">#--</p>
+                  </div>
+                  <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+                    ✅
+                  </div>
+                </div>
+
+                <div class="text-xs text-slate-400 border-t border-slate-800 pt-3">
+                  Bu cihazdan kaydınız alınmıştır. Yanlış kod girdiyseniz aşağıdaki butondan silebilir ve tekrar düzenleyebilirsiniz.
+                </div>
+
+                <button onclick="handleDeleteRegistration()" class="w-full py-2.5 px-4 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-trash-can"></i> Kaydımı Sil ve Tekrar Yaz
+                </button>
+              </div>
+            </div>
+
+            <!-- Toast Alert Inside Card -->
+            <div id="form-toast" class="hidden mt-4 p-3 rounded-lg text-sm text-center font-bold"></div>
+
+          </div>
+        </div>
+
+        <!-- Right: Stats & Participants -->
+        <div class="md:col-span-5 space-y-6">
+          <div class="bg-gradient-to-r from-amber-900/30 to-yellow-900/20 p-6 rounded-2xl border border-amber-500/30 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-amber-300/70 font-bold uppercase">Toplam Katılımcı Sayısı</p>
+              <h4 id="total-participants-count" class="text-3xl font-black text-amber-400">0</h4>
+            </div>
+            <div class="text-4xl text-amber-400/50">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+
+          <!-- Live Participants List -->
+          <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+            <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2 uppercase tracking-wider">
+              <i class="fa-solid fa-list-ol"></i> Katılan Klan Üyeleri
+            </h3>
+            <div id="participants-list" class="max-h-60 overflow-y-auto space-y-2 pr-2 text-xs">
+              <p class="text-slate-500 text-center py-4">Katılımcılar yükleniyor...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. RULES TAB -->
+    <section id="sec-rules" class="tab-section hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div class="text-center mb-8">
+          <h3 class="text-3xl font-black text-white">SURENA Klan Kuralları</h3>
+          <p class="text-slate-400 text-sm">Disiplinli ve güçlü klan ortamı kurallarımız.</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 flex gap-4">
+            <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-black text-lg shrink-0">1</div>
+            <div>
+              <h4 class="font-bold text-white mb-1">Savaş Hakları</h4>
+              <p class="text-xs text-slate-400">Klan Savaşlarında her iki hak da kullanılmak zorundadır.</p>
+            </div>
+          </div>
+          <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 flex gap-4">
+            <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-black text-lg shrink-0">2</div>
+            <div>
+              <h4 class="font-bold text-white mb-1">Klan Oyunları</h4>
+              <p class="text-xs text-slate-400">Klan Oyunlarında minimum 1000 puan yapmak zorunludur.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ANNOUNCEMENTS TAB -->
+    <section id="sec-announcements" class="tab-section hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div class="text-center mb-8">
+          <h3 class="text-3xl font-black text-white">Klan Duyuruları</h3>
+          <p class="text-slate-400 text-sm">En güncel klan duyuruları.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-slate-900 p-6 rounded-2xl border border-amber-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs font-bold">ÇEKİLİŞ DUYURUSU</span>
+            </div>
+            <h4 class="text-lg font-bold text-white">Ayın 10'unda Altın Bilet Çekilişi!</h4>
+            <p class="text-slate-300 text-sm">
+              Çekiliş her ayın 10'unda Otomatik olarak saat 00:00'da sonlanır ve kazanan 3 üye sistem tarafından ilan edilir.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-950 border-t border-slate-800 py-6 mt-12">
+    <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-500 space-y-2">
+      <p>© SURENA Clan Portal - Altın Bilet Sistemi</p>
+    </div>
+  </footer>
+
+  <!-- FIREBASE & CORE SCRIPT MODULE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // ----------------------------------------------------
+    // CANLI FIREBASE YAPILANDIRMASI (SURENA CLAN)
+    // ----------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhjR1uJ5WGKwgNgGA-CGGQ9tYa5HPg28E",
+      authDomain: "surena-clan.firebaseapp.com",
+      projectId: "surena-clan",
+      storageBucket: "surena-clan.firebasestorage.app",
+      messagingSenderId: "33720808983",
+      appId: "1:33720808983:web:fd409411e2cb31e1f18e52",
+      measurementId: "G-HPC95FRKCM"
+    };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'surena-clan-app';
+
+    // Firebase Init
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Global App State
+    let currentUser = null;
+    let allEntries = [];
+    let myRegistration = null;
+    const STORAGE_MY_TAG = 'surena_device_tag';
+
+    // ----------------------------------------------------
+    // AUTHENTICATION & INIT
+    // ----------------------------------------------------
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Sayfa yüklenir yüklenmez veritabanı dinleyicisini doğrudan başlatıyoruz
+      startRealtimeListeners();
+
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.warn("Giriş uyarısı (İşlem devam edecek):", err);
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+        }
+      });
+
+      startCountdownLoop();
+    });
+
+    // ----------------------------------------------------
+    // REALTIME FIRESTORE LISTENERS
+    // ----------------------------------------------------
+    function startRealtimeListeners() {
+      const entriesCol = collection(db, 'artifacts', appId, 'public', 'data', 'giveaway_entries');
+      onSnapshot(entriesCol, (snapshot) => {
+        allEntries = [];
+        snapshot.forEach(docSnap => {
+          allEntries.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        checkMyDeviceRegistration();
+        renderParticipantsList();
+        checkAndHandleDrawResults();
+      }, (err) => {
+        console.error("Firestore Listen Error:", err);
+      });
+    }
+
+    function checkMyDeviceRegistration() {
+      const savedTag = localStorage.getItem(STORAGE_MY_TAG);
+      if (savedTag) {
+        myRegistration = allEntries.find(e => e.tag === savedTag) || null;
+      } else {
+        myRegistration = null;
+      }
+      renderFormState();
+    }
+
+    // ----------------------------------------------------
+    // REGISTRATION ACTIONS
+    // ----------------------------------------------------
+    window.handleRegister = async function() {
+      const tagInput = document.getElementById('player-tag-input').value.trim().toUpperCase();
+      const nameInput = document.getElementById('player-name-input').value.trim();
+
+      let formattedTag = tagInput.startsWith('#') ? tagInput : '#' + tagInput;
+
+      if (formattedTag.length < 5) {
+        showToast('Geçerli bir Oyuncu Kodu (Tag) yazınız! (Örn: #P9Y082LLQ)', 'error');
+        return;
+      }
+
+      if (!nameInput) {
+        showToast('Lütfen klan içi oyuncu adınızı giriniz.', 'error');
+        return;
+      }
+
+      // Oturum yoksa tekrar anonim giriş dene ama hata verse de durma
+      if (!auth.currentUser) {
+        try {
+          await signInAnonymously(auth);
+        } catch(authErr) {
+          console.warn("Anonim giriş pas geçildi, kayda devam ediliyor...", authErr);
+        }
+      }
+
+      const duplicate = allEntries.some(e => e.tag === formattedTag);
+      if (duplicate) {
+        showToast('Bu Oyuncu Kodu ile zaten bir kayıt oluşturulmuş!', 'error');
+        return;
+      }
+
+      const docId = formattedTag.replace('#', '');
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'giveaway_entries', docId);
+
+      try {
+        const payload = {
+          tag: formattedTag,
+          name: nameInput,
+          createdAt: new Date().toISOString()
+        };
+        await setDoc(docRef, payload);
+
+        localStorage.setItem(STORAGE_MY_TAG, formattedTag);
+        showToast('Çekiliş kaydınız başarıyla kaydedildi! 🎉', 'success');
+      } catch (e) {
+        console.error("Firestore Yazma Hatası:", e);
+        showToast(`Veritabanı Hatası: ${e.message || 'Yazma izni reddedildi.'}`, 'error');
+      }
+    };
+
+    window.handleDeleteRegistration = async function() {
+      const savedTag = localStorage.getItem(STORAGE_MY_TAG);
+      if (!savedTag) return;
+
+      if (!auth.currentUser) {
+        try { await signInAnonymously(auth); } catch(e){}
+      }
+
+      const docId = savedTag.replace('#', '');
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'giveaway_entries', docId);
+
+      try {
+        await deleteDoc(docRef);
+        localStorage.removeItem(STORAGE_MY_TAG);
+        myRegistration = null;
+        showToast('Kaydınız silindi. Yeni kodunuzla tekrar katılabilirsiniz.', 'info');
+        renderFormState();
+      } catch (e) {
+        console.error("Firestore Silme Hatası:", e);
+        showToast(`Silme Hatası: ${e.message}`, 'error');
+      }
+    };
+
+    // ----------------------------------------------------
+    // UI RENDERERS
+    // ----------------------------------------------------
+    function renderFormState() {
+      const unregBox = document.getElementById('form-unregistered');
+      const regBox = document.getElementById('form-registered');
+
+      if (myRegistration) {
+        unregBox.classList.add('hidden');
+        regBox.classList.remove('hidden');
+        document.getElementById('reg-player-name').innerText = myRegistration.name;
+        document.getElementById('reg-player-tag').innerText = myRegistration.tag;
+      } else {
+        regBox.classList.add('hidden');
+        unregBox.classList.remove('hidden');
+      }
+    }
+
+    function renderParticipantsList() {
+      const listContainer = document.getElementById('participants-list');
+      const countHeader = document.getElementById('total-participants-count');
+
+      countHeader.innerText = allEntries.length;
+
+      if (allEntries.length === 0) {
+        listContainer.innerHTML = '<p class="text-slate-500 text-center py-4">Henüz katılan olmadı. İlk kayılan sen ol!</p>';
+        return;
+      }
+
+      const myTag = localStorage.getItem(STORAGE_MY_TAG);
+
+      listContainer.innerHTML = allEntries.map((item, idx) => {
+        const isMe = item.tag === myTag;
+        return `
+          <div class="flex items-center justify-between p-2.5 rounded-xl ${isMe ? 'bg-amber-500/20 border border-amber-500/50' : 'bg-slate-950/60 border border-slate-800'} transition">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-800 text-amber-400 font-bold text-[10px] flex items-center justify-center">${idx + 1}</span>
+              <div>
+                <p class="font-bold text-white text-xs">${escapeHtml(item.name)} ${isMe ? '<span class="text-[10px] text-amber-400 font-normal">(Sen)</span>' : ''}</p>
+                <p class="font-mono text-[10px] text-slate-400">${escapeHtml(item.tag)}</p>
+              </div>
+            </div>
+            <span class="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md">Bilet Alındı</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showToast(msg, type = 'info') {
+      const toast = document.getElementById('form-toast');
+      toast.classList.remove('hidden', 'bg-red-500/20', 'text-red-300', 'bg-emerald-500/20', 'text-emerald-300', 'bg-amber-500/20', 'text-amber-300');
+
+      if (type === 'error') {
+        toast.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+      } else if (type === 'success') {
+        toast.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border', 'border-emerald-500/30');
+      } else {
+        toast.classList.add('bg-amber-500/20', 'text-amber-300', 'border', 'border-amber-500/30');
+      }
+
+      toast.innerText = msg;
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 5000);
+    }
+
+    // Helper HTML Escape
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // ----------------------------------------------------
+    // COUNTDOWN & DAY 10 AUTOMATION LOGIC
+    // ----------------------------------------------------
+    function getNext10thTarget() {
+      const now = new Date();
+      let target = new Date(now.getFullYear(), now.getMonth(), 10, 0, 0, 0);
+
+      if (now.getDate() > 10 || (now.getDate() === 10 && now.getHours() >= 0)) {
+        target = new Date(now.getFullYear(), now.getMonth() + 1, 10, 0, 0, 0);
+      }
+      return target;
+    }
+
+    function startCountdownLoop() {
+      function updateTimer() {
+        const now = new Date();
+        const target = getNext10thTarget();
+        const diff = target - now;
+
+        if (diff <= 0) {
+          document.getElementById('cd-days').innerText = '00';
+          document.getElementById('cd-hours').innerText = '00';
+          document.getElementById('cd-minutes').innerText = '00';
+          document.getElementById('cd-seconds').innerText = '00';
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('cd-days').innerText = String(days).padStart(2, '0');
+        document.getElementById('cd-hours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('cd-minutes').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('cd-seconds').innerText = String(seconds).padStart(2, '0');
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+
+    function checkAndHandleDrawResults() {
+      const now = new Date();
+      const isDay10 = now.getDate() === 10;
+
+      const winnersBox = document.getElementById('winners-showcase');
+      const giveawayActiveBox = document.getElementById('giveaway-active-box');
+
+      if (isDay10) {
+        winnersBox.classList.remove('hidden');
+        giveawayActiveBox.classList.add('hidden');
+
+        renderWinnersDisplay();
+        triggerConfetti();
+      } else {
+        winnersBox.classList.add('hidden');
+        giveawayActiveBox.classList.remove('hidden');
+      }
+    }
+
+    function renderWinnersDisplay() {
+      const grid = document.getElementById('winners-grid');
+      
+      let winners = [];
+      if (allEntries.length >= 3) {
+        const seeded = [...allEntries].sort((a, b) => a.tag.localeCompare(b.tag));
+        winners = [seeded[0], seeded[1], seeded[2]];
+      } else if (allEntries.length > 0) {
+        winners = [...allEntries];
+      }
+
+      if (winners.length === 0) {
+        grid.innerHTML = '<p class="col-span-3 text-slate-400">Bu çekilişe henüz kimse katılmadı.</p>';
+        return;
+      }
+
+      const medals = ['🥇 1. Kazanan', '🥈 2. Kazanan', '🥉 3. Kazanan'];
+
+      grid.innerHTML = winners.map((w, i) => `
+        <div class="winner-card bg-slate-950 p-6 rounded-2xl border-2 border-amber-500/60 shadow-xl text-center space-y-2">
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">${medals[i] || 'Winner'}</span>
+          <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/20 flex items-center justify-center text-3xl">
+            🏆
+          </div>
+          <h4 class="text-xl font-black text-white">${escapeHtml(w.name)}</h4>
+          <p class="font-mono text-xs text-amber-400 font-bold">${escapeHtml(w.tag)}</p>
+        </div>
+      `).join('');
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    // ----------------------------------------------------
+    // NAVIGATION TABS
+    // ----------------------------------------------------
+    window.switchTab = function(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-amber-400', 'bg-slate-800');
+        btn.classList.add('text-slate-300');
+      });
+
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.classList.add('text-amber-400', 'bg-slate-800');
+        activeNav.classList.remove('text-slate-300');
+      }
+    };
+
+    window.toggleMobileMenu = function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    };
+  </script>
+</body>
+</html>
